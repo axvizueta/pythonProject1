@@ -1,15 +1,31 @@
 from selenium import webdriver
+import os
 
 from selenium.webdriver.common.by import By
+from dotenv import load_dotenv, find_dotenv
 
-#load_dotenv()
-#user = os.getenv('MONGO_USER')
-#password = os.getenv('MONGO_PASSWORD')
-#hostname = os.getenv('MONGO_HOSTNAME')
 
-#uri = f"mongodb+srv://{user}:{password}@{hostname}/?retryWrites=true&w=majority"
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 
-#mongo_client = MongoClient(uri, server_api=ServerApi('1'))
+load_dotenv(find_dotenv())
+
+
+USER = os.environ.get("MONGO_USER")
+PASSWORD = os.environ.get("MONGO_PASSWORD")
+HOSTNAME = os.environ.get("MONGO_HOSTNAME")
+
+uri = f"mongodb+srv://{USER}:{PASSWORD}@{HOSTNAME}/?retryWrites=true&w=majority"
+
+# Create a new client and connect to the server
+client = MongoClient(uri, server_api=ServerApi('1'))
+
+# Send a ping to confirm a successful connection
+try:
+    client.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
 
 
 consulta = "Mazda CX-5"
@@ -45,7 +61,11 @@ for card in vehicle_cards:
 
         }
 
-       # db = mongo_client.get_database('db_eig')
+        mydb = client["proyecto"]
+        carros_collection = mydb["carros"]
+        x = carros_collection.insert_one(coche_actual)
+
+        # db = mongo_client.get_database('db_eig')
         #collection = db.get_collection(f'patiotuerca')
 
         #collection.insert_one(coche_actual)
